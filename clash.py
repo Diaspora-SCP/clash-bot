@@ -23,7 +23,7 @@ HEADERS = {
     "Authorization": f"Bearer {COC_API_TOKEN}"
 }
 
-# --- ИНИЦИАЛИЗА БАЗЫ ДАННЫХ ---
+# --- ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ ---
 def init_db():
     conn = sqlite3.connect("clan_capital.db")
     cursor = conn.cursor()
@@ -299,6 +299,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "player_history":
         await player_history_handler(query)
 
+# Обработчик ошибок
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
+    logging.error(f"Произошла ошибка при обработке обновления: {context.error}")
+
 # Запуск планировщика в цикле событий
 async def setup_scheduler(app):
     scheduler = AsyncIOScheduler()
@@ -315,6 +319,7 @@ if __name__ == "__main__":
     
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
+    app.add_error_handler(error_handler)
 
     print("Ратуша готова, Сэр! Перезапустите бота.")
     app.run_polling()
