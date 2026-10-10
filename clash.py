@@ -315,11 +315,13 @@ async def setup_scheduler(app):
     print("⏰ Планировщик авто-сохранений по понедельникам в 12:00 успешно запущен!")
 
 if __name__ == "__main__":
+    print("Ратуша готова, Сэр! Принудительно сбрасываем старые вебхуки в Telegram...")
+    requests.get(f"https://api.telegram.org/bot{BOT_TOKEN}/deleteWebhook?drop_pending_updates=True")
+
     app = ApplicationBuilder().token(BOT_TOKEN).post_init(setup_scheduler).build()
     
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
     app.add_error_handler(error_handler)
 
-    print("Ратуша готова, Сэр! Перезапустите бота.")
     app.run_polling()
