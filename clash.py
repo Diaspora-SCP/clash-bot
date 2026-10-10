@@ -1,10 +1,28 @@
 import logging
 import sqlite3
 import requests
+import os
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+
+# --- ЗАГЛУШКА ДЛЯ ВЕБ-ПОРТА RENDER ---
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is alive!")
+
+    def log_message(self, format, *args):
+        return  # Отключаем лишний мусор в логах
+
+def run_dummy_server():
+    port = int(os.environ.get("PORT", 8080))
+    server = HTTPServer(("0.0.0.0", port), HealthCheckHandler)
+    server.serve_forever()
 
 # --- НАСТРОЙКИ (КОНФИГУРАЦИЯ) ---
 BOT_TOKEN = "8716865369:AAFLGUHrg6qVK1lPAQZvhUepyoN2xInfsik"
@@ -315,6 +333,9 @@ async def setup_scheduler(app):
     print("⏰ Планировщик авто-сохранений по понедельникам в 12:00 успешно запущен!")
 
 if __name__ == "__main__":
+    # Запускаем фоновый HTTP-сервер для ублажения Render
+    threading.Thread(target=run_dummy_server, daemon=True).start()
+
     print("Ратуша готова, Сэр! Принудительно сбрасываем старые вебхуки в Telegram...")
     requests.get(f"https://api.telegram.org/bot{BOT_TOKEN}/deleteWebhook?drop_pending_updates=True")
 
