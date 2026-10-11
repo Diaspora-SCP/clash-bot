@@ -17,7 +17,7 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"Bot is alive!")
 
     def log_message(self, format, *args):
-        return  # Отключаем лишний мусор в логах
+        return
 
 def run_dummy_server():
     port = int(os.environ.get("PORT", 8080))
@@ -333,10 +333,18 @@ async def setup_scheduler(app):
     print("⏰ Планировщик авто-сохранений по понедельникам в 12:00 успешно запущен!")
 
 if __name__ == "__main__":
-    # Запускаем фоновый HTTP-сервер для ублажения Render
+    # Запускаем фоновый HTTP-сервер для Render
     threading.Thread(target=run_dummy_server, daemon=True).start()
 
-    print("Ратуша готова, Сэр! Принудительно сбрасываем старые вебхуки в Telegram...")
+    # Определяем реальный публичный IP сервера Render
+    try:
+        render_ip = requests.get('https://api.ipify.org', timeout=5).text
+        print("\n" + "="*50)
+        print(f"🌐 ТЕКУЩИЙ IP СЕРВЕРА RENDER: {render_ip}")
+        print("="*50 + "\n")
+    except Exception as e:
+        print(f"Не удалось определить IP: {e}")
+
     requests.get(f"https://api.telegram.org/bot{BOT_TOKEN}/deleteWebhook?drop_pending_updates=True")
 
     app = ApplicationBuilder().token(BOT_TOKEN).post_init(setup_scheduler).build()
