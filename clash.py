@@ -26,7 +26,7 @@ def run_dummy_server():
 
 # --- НАСТРОЙКИ (КОНФИГУРАЦИЯ) ---
 BOT_TOKEN = "8716865369:AAFLGUHrg6qVK1lPAQZvhUepyoN2xInfsik"
-COC_API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjQyMmViN2U0LWY0NGEtNGY5NS1hNjMwLTBlZjAwNDgxYWMwMyIsImlhdCI6MTc5MTY1MTM4Niwic3ViIjoiZGV2ZWxvcGVyL2IzNjEzMGIyLTE1YjAtNGUzZC05YTc3LTIyMmZiMmY5NjY3ZSIsInNjb3BlcyI6WyJjbGFzaCJdLCJsaW1pdHMiOlt7InRpZXIiOiJkZXZlbG9wZXIvc2lsdmVyIiwidHlwZSI6InRocm90dGxpbmcifSx7ImNpZHJzIjpbIjAuMC4wLjAiXSwidHlwZSI6ImNsaWVudCJ9XX0.s5wkl7fzjYgvp9-Th6u0X2vI41Se-qxFn4TKPOnKJ6uRegm1tlbyqwOthu_JQ-umU4gjIHUEOYTBz9i39MzvDQ"
+COC_API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjI0OTAwZjk3LWJiYjUtNGVmMC1hZTFlLTM2YWRhZDE1NTc2ZSIsImlhdCI6MTc5MTY5ODUxNywic3ViIjoiZGV2ZWxvcGVyL2IzNjEzMGIyLTE1YjAtNGUzZC05YTc3LTIyMmZiMmY5NjY3ZSIsInNjb3BlcyI6WyJjbGFzaCJdLCJsaW1pdHMiOlt7InRpZXIiOiJkZXZlbG9wZXIvc2lsdmVyIiwidHlwZSI6InRocm90dGxpbmcifSx7ImNpZHJzIjpbIjc0LjIyMC40OC4yOSJdLCJ0eXBlIjoiY2xpZW50In1dfQ.oMnUXP4OnTL9-IK_tA_P07GO_thGVoqC9wMf8xFZRl8zl_CoraEoTtZ1LHvePZsYfKl6IIbm__jLdxLjlFbhvg"
 CLAN_TAG = "#2L80PP89C"
 
 ADMIN_CHAT_ID = None 
@@ -71,7 +71,7 @@ async def get_ip_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         ip = requests.get('https://api.ipify.org', timeout=5).text
         await update.message.reply_text(
-            f"🌐 **IP-адрес сервера Render:**\n`{ip}`\n\nСкопируйте его и вставьте в Allowed IP на сайте Supercell, Сэр!",
+            f"🌐 **IP-адрес сервера Render:**\n`{ip}`",
             parse_mode="Markdown"
         )
     except Exception as e:
