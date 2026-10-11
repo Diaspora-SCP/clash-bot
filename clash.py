@@ -66,6 +66,17 @@ def get_clean_tag(tag: str) -> str:
         tag = "#" + tag
     return tag.replace("#", "%23")
 
+# КОМАНДА ДЛЯ ПОЛУЧЕНИЯ IP СЕРВЕРА В TELEGRAM
+async def get_ip_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        ip = requests.get('https://api.ipify.org', timeout=5).text
+        await update.message.reply_text(
+            f"🌐 **IP-адрес сервера Render:**\n`{ip}`\n\nСкопируйте его и вставьте в Allowed IP на сайте Supercell, Сэр!",
+            parse_mode="Markdown"
+        )
+    except Exception as e:
+        await update.message.reply_text(f"❌ Не удалось определить IP: {e}")
+
 # ФУНКЦИЯ АВТОМАТИЧЕСКОГО СОХРАНЕНИЯ РЕЙДА
 async def auto_save_raid(app):
     global ADMIN_CHAT_ID
@@ -330,26 +341,16 @@ async def setup_scheduler(app):
         args=[app]
     )
     scheduler.start()
-    print("⏰ Планировщик авто-сохранений по понедельникам в 12:00 успешно запущен!")
 
 if __name__ == "__main__":
-    # Запускаем фоновый HTTP-сервер для Render
     threading.Thread(target=run_dummy_server, daemon=True).start()
-
-    # Определяем реальный публичный IP сервера Render
-    try:
-        render_ip = requests.get('https://api.ipify.org', timeout=5).text
-        print("\n" + "="*50)
-        print(f"🌐 ТЕКУЩИЙ IP СЕРВЕРА RENDER: {render_ip}")
-        print("="*50 + "\n")
-    except Exception as e:
-        print(f"Не удалось определить IP: {e}")
 
     requests.get(f"https://api.telegram.org/bot{BOT_TOKEN}/deleteWebhook?drop_pending_updates=True")
 
     app = ApplicationBuilder().token(BOT_TOKEN).post_init(setup_scheduler).build()
     
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("ip", get_ip_handler))
     app.add_handler(CallbackQueryHandler(button_handler))
     app.add_error_handler(error_handler)
 
