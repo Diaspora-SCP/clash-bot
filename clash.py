@@ -3,6 +3,7 @@ import sqlite3
 import requests
 import os
 import threading
+import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
@@ -17,12 +18,25 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"Bot is alive!")
 
     def log_message(self, format, *args):
-        return
+        return  # Отключаем мусорные логи запросов
 
 def run_dummy_server():
     port = int(os.environ.get("PORT", 8080))
     server = HTTPServer(("0.0.0.0", port), HealthCheckHandler)
     server.serve_forever()
+
+# --- ФОНОВЫЙ САМОПИНГ ПРОТИВ СПЯЧКИ RENDER ---
+def keep_alive_ping():
+    url = "https://clash-bot-sq1n.onrender.com"
+    # Даем серверу 30 секунд на полный запуск перед первым пингом
+    time.sleep(30)
+    while True:
+        try:
+            res = requests.get(url, timeout=10)
+            logging.info(f"⏰ Самопинг выполнен (Статус: {res.status_code}): Render не уснет!")
+        except Exception as e:
+            logging.error(f"Ошибка самопинга: {e}")
+        time.sleep(600)  # Пингуем каждые 10 минут (600 секунд)
 
 # --- НАСТРОЙКИ (КОНФИГУРАЦИЯ) ---
 BOT_TOKEN = "8716865369:AAFLGUHrg6qVK1lPAQZvhUepyoN2xInfsik"
@@ -343,8 +357,13 @@ async def setup_scheduler(app):
     scheduler.start()
 
 if __name__ == "__main__":
+    # 1. Запускаем фоновый веб-сервер
     threading.Thread(target=run_dummy_server, daemon=True).start()
 
+    # 2. Запускаем фоновый самопинг
+    threading.Thread(target=keep_alive_ping, daemon=True).start()
+
+    # 3. Сбрасываем зависшие вебхуки Telegram
     requests.get(f"https://api.telegram.org/bot{BOT_TOKEN}/deleteWebhook?drop_pending_updates=True")
 
     app = ApplicationBuilder().token(BOT_TOKEN).post_init(setup_scheduler).build()
